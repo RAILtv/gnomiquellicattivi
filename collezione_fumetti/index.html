@@ -1,45 +1,82 @@
 <!DOCTYPE html>
-<?php
-include("inc/db.php");
-
-
-
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <title>Collezione Fumetti</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <title>Gnome Reads</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #5291ad;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 80%;
+      max-width: 1000px;
+    }
+
+    .logo-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #000;
+    }
+
+    .logo-section img {
+      width: 480px;
+      height: auto;
+    }
+
+    .logo-section h1 {
+      font-size: 48px;
+      margin: 10px 0 0;
+      text-align: center;
+    }
+
+    .button-section {
+      background-color: #234248;
+      padding: 40px;
+      border-radius: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .button-section button {
+      background-color: #0c1b16;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 20px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 300px;
+    }
+
+    .button-section button:hover {
+      background-color: #12322b;
+    }
+  </style>
 </head>
 <body>
-    <h1>Benvenuto nella collezione di fumetti</h1>
 
-    <div style="margin-bottom: 20px;">
-        <a href="login.php"><button>Accedi</button></a>
-        <a href="register.php"><button>Registrati</button></a>
-        <a href="#fumetti"><button>Vedi tutti i fumetti</button></a>
+  <div class="container">
+    <div class="logo-section">
+      <img src="logo_folletto.png" alt="Logo Gnome Reads">
     </div>
+    <div class="button-section">
+      <button>ACCEDI</button>
+      <button>REGISTRATI</button>
+      <button>TUTTI I FUMETTI</button>
+    </div>
+  </div>
 
-    <h2 id="fumetti">Tutti i fumetti:</h2>
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>Titolo</th>
-            <th>Autore</th>
-            <th>Anno</th>
-            <th>Genere</th>
-            <th>Descrizione</th>
-            <th>Volumi Usciti</th>
-        </tr>
-
-        <?php while 
-        <tr>
-            <td><?= htmlspecialchars($row['titolo']) ?></td>
-            <td><?= htmlspecialchars($row['autore']) ?></td>
-            <td><?= $row['anno'] ?></td>
-            <td><?= htmlspecialchars($row['genere']) ?></td>
-            <td><?= htmlspecialchars($row['descrizione']) ?></td>
-            <td><?= $row['numero_volumi'] ?></td>
-        </tr>
-        <?php endwhile; ?>
-    </table>
 </body>
 </html>
