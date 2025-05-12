@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrazione</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #5398b3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .form-container {
+      background-color: #264e5a;
+      padding: 40px;
+      border-radius: 30px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      width: 700px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      padding: 20px;
+      border: none;
+      border-radius: 30px;
+      background-color: #081712;
+      color: white;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    button[type="submit"] {
+      padding: 20px;
+      border: none;
+      border-radius: 30px;
+      background-color: #c23d2f;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #a83127;
+    }
+
+    input::placeholder {
+      color: white;
+    }
+
+    input:focus, button:focus {
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <form action="register.php" method="post" class="form-container">
+    <input type="text" name="username" placeholder="NOME" required>
+    <input type="email" name="email" placeholder="EMAIL" required>
+    <input type="password" name="password" placeholder="PASSWORD" required>
+    <button type="submit">REGISTRATI</button>
+  </form>
+</body>
+</html>
