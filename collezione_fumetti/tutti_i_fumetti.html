@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Tutti i Fumetti</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #5398b3;
+    }
+
+    .logo {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 80px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 48px;
+      margin-top: 40px;
+    }
+
+    .fumetti-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+      max-height: 80vh;
+      overflow-y: scroll;
+      gap: 30px;
+    }
+
+    .fumetto {
+      display: grid;
+      grid-template-columns: 150px 1fr 1fr;
+      align-items: center;
+      background-color: #264e5a;
+      color: white;
+      width: 90%;
+      max-width: 900px;
+      border-radius: 30px;
+      padding: 20px;
+    }
+
+    .fumetto img {
+      width: 100%;
+      border-radius: 20px;
+    }
+
+    .info, .descrizione {
+      transform: rotate(-25deg);
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .info {
+      font-weight: bold;
+    }
+
+    .dettagli-btn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #c23d2f;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .dettagli-btn:hover {
+      background-color: #a83127;
+    }
+  </style>
+</head>
+<body>
+  <img src="logo_folletto.png" alt="Logo Gnome Reads" class="logo">
+  <h1>tutti i fumetti</h1>
+
+  <div class="fumetti-container">
+    <div class="fumetto">
+      <img src="img/fumetto1.jpg" alt="Gnomi Ribelli">
+      <div class="info">INFORMAZIONI<br>Titolo: Gnomi Ribelli<br>Autore: Marco Elfi<br>Anno: 2021<br>Genere: Fantasy</div>
+      <div class="descrizione">
+        descrizionen breve<br>La rivolta dei gnomi nel Bosco Antico<br>
+        <button class="dettagli-btn">DI PIU</button>
+      </div>
+    </div>
+
+    <div class="fumetto">
+      <img src="img/fumetto2.jpg" alt="Folletti Urbani">
+      <div class="info">INFORMAZIONI<br>Titolo: Folletti Urbani<br>Autore: Laura Magia<br>Anno: 2020<br>Genere: Urban Fantasy</div>
+      <div class="descrizione">
+        descrizionen breve<br>Folletti metropolitani tra misteri e graffiti<br>
+        <button class="dettagli-btn">DI PIU</button>
+      </div>
+    </div>
+
+    <div class="fumetto">
+      <img src="img/fumetto3.jpg" alt="Cronache del Bosco">
+      <div class="info">INFORMAZIONI<br>Titolo: Cronache del Bosco<br>Autore: L. Verde<br>Anno: 2019<br>Genere: Avventura</div>
+      <div class="descrizione">
+        descrizionen breve<br>Viaggi e sfide in una foresta viva<br>
+        <button class="dettagli-btn">DI PIU</button>
+      </div>
+    </div>
+
+    <div class="fumetto">
+      <img src="img/fumetto4.jpg" alt="Il Piccolo Goblin">
+      <div class="info">INFORMAZIONI<br>Titolo: Il Piccolo Goblin<br>Autore: F. Notte<br>Anno: 2022<br>Genere: Infanzia</div>
+      <div class="descrizione">
+        descrizionen breve<br>Un goblin buono in un mondo di umani<br>
+        <button class="dettagli-btn">DI PIU</button>
+      </div>
+    </div>
+
+    <div class="fumetto">
+      <img src="img/fumetto5.jpg" alt="La Congrega dei Funghi">
+      <div class="info">INFORMAZIONI<br>Titolo: La Congrega dei Funghi<br>Autore: G. Spora<br>Anno: 2023<br>Genere: Horror</div>
+      <div class="descrizione">
+        descrizionen breve<br>Fungo stregoni al centro della terra<br>
+        <button class="dettagli-btn">DI PIU</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
