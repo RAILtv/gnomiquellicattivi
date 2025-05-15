@@ -1,3 +1,3 @@
 # Collezione Fumetti
 
-Gestione collezione fumetti in PHP con utenti e fumetti personali.
+Gestione collezione fumetti in PHP con utenti e fumetti personali.khugku
