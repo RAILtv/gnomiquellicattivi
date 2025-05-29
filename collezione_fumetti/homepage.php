@@ -67,6 +67,23 @@ require_once 'config.php';
             margin-top: 30px;
         }
 
+        .view-comics-btn {
+            display: inline-block;
+            background-color: #12322b;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 1.2em;
+            margin: 20px 0;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .view-comics-btn:hover {
+            background-color: #1a4d42;
+            transform: scale(1.05);
+        }
+
         .card {
             background-color: #234248;
             padding: 30px;
@@ -85,10 +102,50 @@ require_once 'config.php';
         .card h3 {
             margin-top: 0;
             color: #8ecae0;
+            font-size: 1.5em;
+            margin-bottom: 15px;
         }
 
         .card p {
             margin-bottom: 0;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .comics-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .comic-card {
+            background-color: #234248;
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .comic-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .comic-title {
+            font-size: 1.2em;
+            color: #8ecae0;
+            margin-bottom: 10px;
+        }
+
+        .comic-info {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .rating {
+            color: #ffd700;
+            margin-top: 10px;
         }
 
         h1 {
@@ -143,7 +200,7 @@ require_once 'config.php';
 
     <div class="container">
         <div class="welcome-section">
-            <img src="logo_folletto.png" alt="Gnome Reads Logo" class="logo">
+            <img src="logo_folletto.png" alt="Logo Folletto" class="logo" style="width: 200px; height: auto; display: block; margin: 0 auto 20px;">
             <h1>Benvenuto in Gnome Reads</h1>
             <p class="welcome-text">
                 La tua biblioteca digitale di fumetti fantasy. Esplora mondi magici, 
@@ -172,6 +229,10 @@ require_once 'config.php';
                     <div class="stat-label">Generi Diversi</div>
                 </div>
             </div>
+
+            <a href="tutti_i_fumetti.php" class="view-comics-btn">
+                Visualizza Tutti i Fumetti
+            </a>
         </div>
 
         <div class="feature-cards">
@@ -187,6 +248,28 @@ require_once 'config.php';
                 <h3>Novità in Arrivo</h3>
                 <p>Resta aggiornato sulle ultime uscite e le prossime aggiunte alla collezione.</p>
             </div>
+        </div>
+
+        <h2 style="color: white; text-align: center; margin-top: 40px;">Fumetti in Evidenza</h2>
+        <div class="comics-preview">
+            <?php
+            $sql = "SELECT * FROM fumetti ORDER BY rating DESC LIMIT 4";
+            $result = $conn->query($sql);
+            
+            if ($result && $result->num_rows > 0) {
+                while($fumetto = $result->fetch_assoc()) {
+                    echo '<div class="comic-card">';
+                    echo '<div class="comic-title">' . htmlspecialchars($fumetto['titolo']) . '</div>';
+                    echo '<div class="comic-info">';
+                    echo '<div>Autore: ' . htmlspecialchars($fumetto['autore']) . '</div>';
+                    echo '<div>Genere: ' . htmlspecialchars($fumetto['genere']) . '</div>';
+                    echo '<div>Anno: ' . htmlspecialchars($fumetto['anno']) . '</div>';
+                    echo '</div>';
+                    echo '<div class="rating">★ ' . number_format($fumetto['rating'], 1) . '</div>';
+                    echo '</div>';
+                }
+            }
+            ?>
         </div>
     </div>
 </body>
