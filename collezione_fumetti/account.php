@@ -14,6 +14,13 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
+
+// Recupera i fumetti letti e i volumi per la sezione profilo
+$sql = "SELECT f.titolo, c.quantita_letti, c.quantita FROM fumetti f INNER JOIN collezione c ON f.id = c.fumetto_id WHERE c.utente_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$letture = $stmt->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -84,6 +91,23 @@ $user = $result->fetch_assoc();
             font-weight: bold;
             color: #aaa;
         }
+
+        table {
+            width: 100%;
+            color: white;
+            background: #234248;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            color: #8ecae0;
+        }
     </style>
 </head>
 <body>
@@ -102,6 +126,19 @@ $user = $result->fetch_assoc();
             <div class="profile-info">
                 <p><span class="label">Username:</span> <?php echo htmlspecialchars($user['username']); ?></p>
                 <p><span class="label">Email:</span> <?php echo htmlspecialchars($user['email']); ?></p>
+            </div>
+            <div class="profile-info">
+                <h3 style="color:#8ecae0;">I tuoi progressi di lettura:</h3>
+                <table>
+                    <tr><th>Fumetto</th><th>Pagina</th><th>Volume</th></tr>
+                    <?php while($r = $letture->fetch_assoc()): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($r['titolo']); ?></td>
+                            <td><?php echo $r['quantita_letti']; ?></td>
+                            <td><?php echo $r['quantita']; ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </table>
             </div>
         </div>
     </div>

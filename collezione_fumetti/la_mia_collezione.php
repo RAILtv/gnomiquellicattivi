@@ -6,16 +6,68 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once 'config.php';
-
 $user_id = $_SESSION['user_id'];
-$sql = "SELECT f.*, c.quantita, c.quantita_letti, c.quantita_nonletti 
-        FROM fumetti f 
-        INNER JOIN collezione c ON f.id = c.fumetto_id 
-        WHERE c.utente_id = ?";
+
+// Aggiorna pagina letta
+if (isset($_POST['update_page'])) {
+    $fumetto_id = intval($_POST['fumetto_id']);
+    $pagina = intval($_POST['pagina']);
+    // Aggiorna quantita_letti
+    $sql = "UPDATE collezione SET quantita_letti = ? WHERE utente_id = ? AND fumetto_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iii", $pagina, $user_id, $fumetto_id);
+    $stmt->execute();
+}
+// Aggiorna volume
+if (isset($_POST['update_volume'])) {
+    $fumetto_id = intval($_POST['fumetto_id']);
+    $volume = intval($_POST['volume']);
+    $sql = "UPDATE collezione SET quantita = ? WHERE utente_id = ? AND fumetto_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iii", $volume, $user_id, $fumetto_id);
+    $stmt->execute();
+}
+
+// Aggiungi fumetto alla collezione
+if (isset($_POST['add_fumetto'])) {
+    $fumetto_id = intval($_POST['fumetto_id']);
+    // Prendi numero volumi
+    $sql = "SELECT numero_volumi FROM fumetti WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $fumetto_id);
+    $stmt->execute();
+    $stmt->bind_result($num_volumi);
+    $stmt->fetch();
+    $stmt->close();
+    // Inserisci nella collezione
+    $sql = "INSERT INTO collezione (utente_id, fumetto_id, quantita, quantita_letti, quantita_nonletti) VALUES (?, ?, 1, 0, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iii", $user_id, $fumetto_id, $num_volumi);
+    $stmt->execute();
+}
+
+// Cancella fumetto dalla collezione
+if (isset($_POST['delete_fumetto'])) {
+    $fumetto_id = intval($_POST['fumetto_id']);
+    $sql = "DELETE FROM collezione WHERE utente_id = ? AND fumetto_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $user_id, $fumetto_id);
+    $stmt->execute();
+}
+
+// Fumetti nella collezione
+$sql = "SELECT f.*, c.quantita, c.quantita_letti, c.quantita_nonletti FROM fumetti f INNER JOIN collezione c ON f.id = c.fumetto_id WHERE c.utente_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
+
+// Fumetti non ancora nella collezione
+$sql = "SELECT * FROM fumetti WHERE id NOT IN (SELECT fumetto_id FROM collezione WHERE utente_id = ?)";
+$stmt2 = $conn->prepare($sql);
+$stmt2->bind_param("i", $user_id);
+$stmt2->execute();
+$not_in_collection = $stmt2->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -100,56 +152,111 @@ $result = $stmt->get_result();
             margin-bottom: 30px;
         }
 
-        .collection-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .comic-card {
+        .comics-table {
+            width: 100%;
             background-color: #234248;
-            border-radius: 15px;
-            padding: 20px;
+            border-radius: 10px;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
             color: white;
-            transition: transform 0.3s;
+            overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .comic-card:hover {
-            transform: translateY(-5px);
+        .comics-table th, .comics-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(18, 50, 43, 0.5);
         }
 
-        .comic-title {
-            font-size: 1.2em;
-            color: #8ecae0;
-            margin-bottom: 10px;
-        }
-
-        .comic-info {
-            margin: 5px 0;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .progress-bar {
-            width: 100%;
+        .comics-table th {
             background-color: #12322b;
-            height: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            overflow: hidden;
+            font-weight: bold;
         }
 
-        .progress-fill {
-            height: 100%;
-            background-color: #8ecae0;
-            transition: width 0.3s;
+        .comics-table tr:hover {
+            background-color: #2d535b;
         }
 
-        .stats {
-            color: #8ecae0;
-            font-size: 0.9em;
+        .add-btn, .update-btn, .important-btn {
+            background-color: #b94a32;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 18px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .add-btn:hover, .update-btn:hover, .important-btn:hover {
+            background-color: #a13e29;
+            transform: scale(1.05);
+        }
+
+        .plus-btn {
+            background-color: #b94a32;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .plus-btn:hover {
+            background-color: #a13e29;
+            transform: scale(1.1);
+        }
+
+        .add-section {
+            margin: 30px 0 10px 0;
+            text-align: center;
+        }
+
+        .add-form {
+            display: inline-block;
             margin-top: 10px;
+        }
+
+        .page-input {
+            width: 60px;
+            border-radius: 10px;
+            border: 1px solid #8ecae0;
+            padding: 5px 10px;
+            font-size: 1em;
+            text-align: center;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-input, .genre-select {
+            padding: 12px 20px;
+            border-radius: 25px;
+            background-color: #234248;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.1);
+            font-size: 1em;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .genre-select {
+            min-width: 220px;
         }
     </style>
 </head>
@@ -166,32 +273,132 @@ $result = $stmt->get_result();
             <a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </div>
-
     <div class="container">
         <h1>La Mia Collezione</h1>
-        
-        <div class="collection-grid">
-            <?php
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    $progress = ($row['quantita_letti'] / $row['numero_volumi']) * 100;
-                    echo '<div class="comic-card">';
-                    echo '<div class="comic-title">' . htmlspecialchars($row['titolo']) . '</div>';
-                    echo '<div class="comic-info">Autore: ' . htmlspecialchars($row['autore']) . '</div>';
-                    echo '<div class="comic-info">Genere: ' . htmlspecialchars($row['genere']) . '</div>';
-                    echo '<div class="progress-bar">';
-                    echo '<div class="progress-fill" style="width: ' . $progress . '%;"></div>';
-                    echo '</div>';
-                    echo '<div class="stats">';
-                    echo 'Letti: ' . $row['quantita_letti'] . ' / ' . $row['numero_volumi'];
-                    echo '</div>';
-                    echo '</div>';
+        <div class="search-container" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+            <input type="text" id="searchInput" onkeyup="searchComics()" placeholder="Cerca per titolo o autore..." class="search-input" style="padding: 12px 20px; border-radius: 25px; background-color: #234248; color: white; border: 2px solid rgba(255,255,255,0.1); width: 400px; font-size: 1em;">
+            <select id="genereFilter" onchange="filterByGenre(this.value)" class="genre-select" style="padding: 12px 20px; border-radius: 25px; background-color: #234248; color: white; border: 2px solid rgba(255,255,255,0.1); min-width: 220px; font-size: 1em;">
+                <option value="">Tutti i Generi</option>
+                <?php
+                $genres = $conn->query("SELECT DISTINCT genere FROM fumetti ORDER BY genere");
+                while($g = $genres->fetch_assoc()) {
+                    echo '<option value="' . htmlspecialchars($g['genere']) . '">' . htmlspecialchars($g['genere']) . '</option>';
                 }
-            } else {
-                echo '<p style="text-align: center; color: white; grid-column: 1/-1;">Non hai ancora aggiunto fumetti alla tua collezione.</p>';
-            }
-            ?>
+                ?>
+            </select>
         </div>
+        <div class="add-section">
+            <form method="post" class="add-form" style="display: flex; justify-content: center; align-items: center; gap: 15px;">
+                <input type="text" id="addSearchInput" onkeyup="filterAddOptions()" placeholder="Cerca fumetto da aggiungere..." class="search-input" style="width: 250px;">
+                <select name="fumetto_id" id="addSelect" required class="page-input" style="min-width: 220px; font-size: 1em;">
+                    <option value="">Seleziona fumetto da aggiungere...</option>
+                    <?php $not_in_collection->data_seek(0); while($f = $not_in_collection->fetch_assoc()): ?>
+                        <option value="<?php echo $f['id']; ?>"><?php echo htmlspecialchars($f['titolo']); ?></option>
+                    <?php endwhile; ?>
+                </select>
+                <button type="submit" name="add_fumetto" class="add-btn" style="font-weight:bold; letter-spacing:1px;">AGGIUNGI</button>
+            </form>
+        </div>
+        <table class="comics-table" id="comicsTable">
+            <thead>
+                <tr>
+                    <th>Titolo</th>
+                    <th>Autore</th>
+                    <th>Anno</th>
+                    <th>Genere</th>
+                    <th>Descrizione</th>
+                    <th>Numero Volumi</th>
+                    <th>Pagina</th>
+                    <th></th>
+                    <th>Volume</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($result->num_rows > 0):
+                    while($row = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['titolo']); ?></td>
+                            <td><?php echo htmlspecialchars($row['autore']); ?></td>
+                            <td><?php echo htmlspecialchars($row['anno']); ?></td>
+                            <td><?php echo htmlspecialchars($row['genere']); ?></td>
+                            <td><?php echo htmlspecialchars($row['descrizione']); ?></td>
+                            <td><?php echo $row['numero_volumi']; ?></td>
+                            <td>
+                                <form method="post" style="display:inline-flex; align-items:center; gap:5px;">
+                                    <input type="hidden" name="fumetto_id" value="<?php echo $row['id']; ?>">
+                                    <input type="number" name="pagina" min="0" max="<?php echo $row['numero_volumi']; ?>" value="<?php echo $row['quantita_letti']; ?>" class="page-input">
+                                    <button type="submit" name="update_page" class="plus-btn" onclick="showStopOverlay()"><i class="fas fa-plus"></i></button>
+                                </form>
+                            </td>
+                            <td></td>
+                            <td>
+                                <form method="post" style="display:inline-flex; align-items:center; gap:5px;">
+                                    <input type="hidden" name="fumetto_id" value="<?php echo $row['id']; ?>">
+                                    <input type="number" name="volume" min="0" max="<?php echo $row['numero_volumi']; ?>" value="<?php echo $row['quantita']; ?>" class="page-input">
+                                    <button type="submit" name="update_volume" class="plus-btn" onclick="showStopOverlay()"><i class="fas fa-plus"></i></button>
+                                </form>
+                            </td>
+                            <td>
+                                <form method="post" onsubmit="return confirm('Sei sicuro di voler rimuovere questo fumetto dalla tua collezione?');">
+                                    <input type="hidden" name="fumetto_id" value="<?php echo $row['id']; ?>">
+                                    <button type="submit" name="delete_fumetto" class="add-btn" style="background-color:#b94a32; font-weight:bold;" onclick="showStopOverlay()">RIMUOVI</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endwhile;
+                else:
+                    echo '<tr><td colspan="10" style="text-align: center; color: white;">Non hai ancora aggiunto fumetti alla tua collezione.</td></tr>';
+                endif; ?>
+            </tbody>
+        </table>
     </div>
+    <script>
+    function filterByGenre() { filterComics(); }
+    function searchComics() { filterComics(); }
+    function filterComics() {
+        const rows = document.querySelectorAll('#comicsTable tbody tr');
+        const searchText = document.getElementById('searchInput').value.toLowerCase();
+        const selectedGenre = document.getElementById('genereFilter').value;
+        rows.forEach(row => {
+            const title = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+            const author = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const genre = row.querySelector('td:nth-child(4)').textContent;
+            const matchesSearch = title.includes(searchText) || author.includes(searchText);
+            const matchesGenre = !selectedGenre || genre === selectedGenre;
+            row.style.display = (matchesSearch && matchesGenre) ? '' : 'none';
+        });
+    }
+
+    function filterAddOptions() {
+        var input = document.getElementById('addSearchInput').value.toLowerCase();
+        var select = document.getElementById('addSelect');
+        for (var i = 0; i < select.options.length; i++) {
+            var txt = select.options[i].text.toLowerCase();
+            select.options[i].style.display = txt.includes(input) ? '' : 'none';
+        }
+    }
+
+    // Funzione per mostrare overlay STOP
+    function showStopOverlay() {
+        if (!document.getElementById('stopOverlay')) {
+            var overlay = document.createElement('div');
+            overlay.id = 'stopOverlay';
+            overlay.style.position = 'fixed';
+            overlay.style.top = 0;
+            overlay.style.left = 0;
+            overlay.style.width = '100vw';
+            overlay.style.height = '100vh';
+            overlay.style.background = 'rgba(0,0,0,0.7)';
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.zIndex = 9999;
+            overlay.innerHTML = '<img src="stop_gnome.png" alt="STOP" style="max-width: 90vw; max-height: 90vh; border-radius: 30px; box-shadow: 0 0 40px #000;">';
+            overlay.onclick = function() { document.body.removeChild(overlay); };
+            document.body.appendChild(overlay);
+        }
+    }
+    </script>
 </body>
 </html>
