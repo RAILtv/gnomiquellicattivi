@@ -1,4 +1,3 @@
-
 -- Creazione del database
 CREATE DATABASE IF NOT EXISTS collezione;
 USE collezione;
@@ -6,6 +5,7 @@ USE collezione;
 DROP TABLE IF EXISTS collezione;
 DROP TABLE IF EXISTS fumetti;
 DROP TABLE IF EXISTS utenti;
+DROP TABLE IF EXISTS commenti;
 
 CREATE TABLE utenti (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -32,6 +32,16 @@ CREATE TABLE collezione (
   quantita INT,
   quantita_letti INT,
   quantita_nonletti INT,
+  FOREIGN KEY (utente_id) REFERENCES utenti(id),
+  FOREIGN KEY (fumetto_id) REFERENCES fumetti(id)
+);
+
+CREATE TABLE commenti (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  utente_id INT NOT NULL,
+  fumetto_id INT NOT NULL,
+  testo TEXT NOT NULL,
+  data_inserimento DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (utente_id) REFERENCES utenti(id),
   FOREIGN KEY (fumetto_id) REFERENCES fumetti(id)
 );

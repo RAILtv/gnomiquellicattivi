@@ -55,6 +55,18 @@ if (isset($_POST['delete_fumetto'])) {
     $stmt->execute();
 }
 
+// Gestione inserimento commento
+if (isset($_POST['add_comment'])) {
+    $fumetto_id = intval($_POST['fumetto_id']);
+    $commento = trim($_POST['commento']);
+    if ($commento !== '') {
+        $sql = "INSERT INTO commenti (utente_id, fumetto_id, testo) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iis", $user_id, $fumetto_id, $commento);
+        $stmt->execute();
+    }
+}
+
 // Fumetti nella collezione
 $sql = "SELECT f.*, c.quantita, c.quantita_letti, c.quantita_nonletti FROM fumetti f INNER JOIN collezione c ON f.id = c.fumetto_id WHERE c.utente_id = ?";
 $stmt = $conn->prepare($sql);
@@ -263,12 +275,14 @@ $not_in_collection = $stmt2->get_result();
 <body>
     <div class="nav-bar">
         <div class="nav-left">
+            <img src="logo_folletto.png" alt="Logo Folletto" style="height:38px; margin-right:18px; vertical-align:middle; border-radius:50%; box-shadow:0 2px 8px #12322b; background:#fff;">
             <a href="homepage.php" class="nav-item"><i class="fas fa-home"></i> Home</a>
             <a href="tutti_i_fumetti.php" class="nav-item"><i class="fas fa-books"></i> Catalogo</a>
             <a href="la_mia_collezione.php" class="nav-item active"><i class="fas fa-bookmark"></i> La Mia Collezione</a>
             <a href="preferiti.php" class="nav-item"><i class="fas fa-star"></i> Preferiti</a>
         </div>
         <div class="nav-right">
+            <img src="logo_folletto.png" alt="Logo Folletto" style="height:38px; margin-right:18px; vertical-align:middle; border-radius:50%; box-shadow:0 2px 8px #12322b; background:#fff;">
             <a href="account.php" class="nav-item"><i class="fas fa-user"></i> Account</a>
             <a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
@@ -328,7 +342,7 @@ $not_in_collection = $stmt2->get_result();
                                 <form method="post" style="display:inline-flex; align-items:center; gap:5px;">
                                     <input type="hidden" name="fumetto_id" value="<?php echo $row['id']; ?>">
                                     <input type="number" name="pagina" min="0" max="<?php echo $row['numero_volumi']; ?>" value="<?php echo $row['quantita_letti']; ?>" class="page-input">
-                                    <button type="submit" name="update_page" class="plus-btn" onclick="showStopOverlay()"><i class="fas fa-plus"></i></button>
+                                    <button type="submit" name="update_page" class="plus-btn"><i class="fas fa-plus"></i></button>
                                 </form>
                             </td>
                             <td></td>
@@ -336,14 +350,15 @@ $not_in_collection = $stmt2->get_result();
                                 <form method="post" style="display:inline-flex; align-items:center; gap:5px;">
                                     <input type="hidden" name="fumetto_id" value="<?php echo $row['id']; ?>">
                                     <input type="number" name="volume" min="0" max="<?php echo $row['numero_volumi']; ?>" value="<?php echo $row['quantita']; ?>" class="page-input">
-                                    <button type="submit" name="update_volume" class="plus-btn" onclick="showStopOverlay()"><i class="fas fa-plus"></i></button>
+                                    <button type="submit" name="update_volume" class="plus-btn"><i class="fas fa-plus"></i></button>
                                 </form>
                             </td>
                             <td>
-                                <form method="post" onsubmit="return confirm('Sei sicuro di voler rimuovere questo fumetto dalla tua collezione?');">
+                                <form method="post" onsubmit="return confirm('Sei sicuro di voler rimuovere questo fumetto dalla tua collezione?');" style="display:inline;">
                                     <input type="hidden" name="fumetto_id" value="<?php echo $row['id']; ?>">
-                                    <button type="submit" name="delete_fumetto" class="add-btn" style="background-color:#b94a32; font-weight:bold;" onclick="showStopOverlay()">RIMUOVI</button>
+                                    <button type="submit" name="delete_fumetto" class="add-btn" style="background-color:#b94a32; font-weight:bold;">RIMUOVI</button>
                                 </form>
+                                <a href="commenti.php?fumetto_id=<?php echo $row['id']; ?>" class="comment-btn" title="Commenti" style="background:#18313a; color:#b94a32; border-radius:50%; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; font-size:1.3em; margin-left:8px; text-decoration:none;"><span aria-label="Commenta">&#128172;</span></a>
                             </td>
                         </tr>
                     <?php endwhile;
@@ -376,27 +391,6 @@ $not_in_collection = $stmt2->get_result();
         for (var i = 0; i < select.options.length; i++) {
             var txt = select.options[i].text.toLowerCase();
             select.options[i].style.display = txt.includes(input) ? '' : 'none';
-        }
-    }
-
-    // Funzione per mostrare overlay STOP
-    function showStopOverlay() {
-        if (!document.getElementById('stopOverlay')) {
-            var overlay = document.createElement('div');
-            overlay.id = 'stopOverlay';
-            overlay.style.position = 'fixed';
-            overlay.style.top = 0;
-            overlay.style.left = 0;
-            overlay.style.width = '100vw';
-            overlay.style.height = '100vh';
-            overlay.style.background = 'rgba(0,0,0,0.7)';
-            overlay.style.display = 'flex';
-            overlay.style.alignItems = 'center';
-            overlay.style.justifyContent = 'center';
-            overlay.style.zIndex = 9999;
-            overlay.innerHTML = '<img src="stop_gnome.png" alt="STOP" style="max-width: 90vw; max-height: 90vh; border-radius: 30px; box-shadow: 0 0 40px #000;">';
-            overlay.onclick = function() { document.body.removeChild(overlay); };
-            document.body.appendChild(overlay);
         }
     }
     </script>

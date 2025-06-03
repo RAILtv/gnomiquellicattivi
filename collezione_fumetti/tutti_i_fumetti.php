@@ -200,7 +200,7 @@ $genres_result = $conn->query($genres_sql);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <div class="container">
-        <h1>La Mia Collezione di Fumetti</h1>
+        <h1>Tutti i Fumetti</h1>
         
         <div class="search-container">
             <input type="text" id="searchInput" onkeyup="searchComics()" placeholder="Cerca per titolo o autore..." class="search-input">
@@ -225,6 +225,7 @@ $genres_result = $conn->query($genres_sql);
                     <th>Descrizione</th>
                     <th>Numero Volumi</th>
                     <th>Valutazione</th>
+                    <th>Commenti</th>
                 </tr>
             </thead>
             <tbody>
@@ -239,10 +240,12 @@ $genres_result = $conn->query($genres_sql);
                         echo "<td>" . htmlspecialchars($fumetto['descrizione']) . "</td>";
                         echo "<td>" . htmlspecialchars($fumetto['numero_volumi']) . "</td>";
                         echo "<td style='color: #ffd700;'>★ " . number_format($fumetto['rating'], 1) . "</td>";
+                        // Pulsante commenti
+                        echo "<td><a href='commenti.php?fumetto_id=" . $fumetto['id'] . "' class='comment-btn' title='Commenti' style='background:#18313a; color:#b94a32; border-radius:50%; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; font-size:1.3em; margin-left:8px; text-decoration:none;'><span aria-label='Commenta'>&#128172;</span></a></td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='6' style='text-align: center;'>Nessun fumetto trovato</td></tr>";
+                    echo "<tr><td colspan='8' style='text-align: center;'>Nessun fumetto trovato</td></tr>";
                 }
                 $conn->close();
                 ?>
