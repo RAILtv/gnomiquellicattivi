@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS=0;
+
 -- Creazione del database
 CREATE DATABASE IF NOT EXISTS collezione;
 USE collezione;
@@ -57,3 +59,5 @@ INSERT INTO fumetti (titolo, autore, anno, genere, descrizione, numero_volumi, r
 ('Regno di Cristallo', 'Sofia Crystal', 2024, 'Fantasy', 'Storie intrecciate nel misterioso regno di cristallo', 6, 4.9),
 ('Magia Sotterranea', 'Giovanni Underground', 2023, 'Fantasy', 'Misteri nelle profondità della terra', 10, 4.6),
 ('Folletti Detective', 'Sam Funnyclock', 2023, 'Comic Fantasy', 'Indagini comiche nel mondo magico', 10, 4.6);
+
+SET FOREIGN_KEY_CHECKS=1;

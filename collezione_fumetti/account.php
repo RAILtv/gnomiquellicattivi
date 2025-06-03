@@ -14,6 +14,10 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
+if (!$user) {
+    echo "<div style='color:red; font-weight:bold;'>Utente non trovato.</div>";
+    exit;
+}
 
 // Recupera i fumetti letti e i volumi per la sezione profilo
 $sql = "SELECT f.titolo, c.quantita_letti, c.quantita FROM fumetti f INNER JOIN collezione c ON f.id = c.fumetto_id WHERE c.utente_id = ?";
